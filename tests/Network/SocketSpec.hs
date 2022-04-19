@@ -1,11 +1,14 @@
 {-# LANGUAGE CPP #-}
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE ScopedTypeVariables #-}
 
 module Network.SocketSpec (main, spec) where
 
 import Control.Concurrent (threadDelay, forkIO)
 import Control.Concurrent.MVar (readMVar)
+import Control.Exception (SomeException)
 import Control.Monad
+import Data.List (isInfixOf)
 import Network.Socket
 import Network.Socket.ByteString
 import Network.Test.Common
@@ -29,6 +32,9 @@ spec = do
 
         it "fails to connect and throws an IOException" $ do
             connect' (8080 :: Int) `shouldThrow` anyIOException
+
+        it "fails to connect exception contains target port" $ do
+            connect' (54321 :: Int) `shouldThrow` \(e :: SomeException) -> "54321" `isInfixOf` show e
 
         it "successfully connects to a socket with no exception" $ do
             withPort $ \portVar -> test (tcp return portVar)
