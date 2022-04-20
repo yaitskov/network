@@ -29,12 +29,16 @@ spec = do
               sock <- socket (addrFamily addr) (addrSocketType addr) (addrProtocol addr)
               connect sock (addrAddress addr)
               return sock
+          assumedFreePort = 8080 :: Int
 
         it "fails to connect and throws an IOException" $ do
-            connect' (8080 :: Int) `shouldThrow` anyIOException
+            connect' assumedFreePort `shouldThrow` anyIOException
 
         it "fails to connect exception contains target port" $ do
-            connect' (54321 :: Int) `shouldThrow` \(e :: SomeException) -> "54321" `isInfixOf` show e
+            connect' assumedFreePort `shouldThrow` \(e :: SomeException) -> show assumedFreePort `isInfixOf` show e
+
+        it "fails to connect exception contains target host" $ do
+            connect' assumedFreePort `shouldThrow` \(e :: SomeException) -> serverAddr `isInfixOf` show e
 
         it "successfully connects to a socket with no exception" $ do
             withPort $ \portVar -> test (tcp return portVar)

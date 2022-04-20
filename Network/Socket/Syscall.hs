@@ -135,14 +135,14 @@ bind s sa = withSocketAddress sa $ \p_sa siz -> void $ withFdSocket s $ \fd -> d
 -- Connecting a socket
 
 -- | Connect to a remote socket at address.
-connect :: SocketAddress sa => Socket -> sa -> IO ()
+connect :: (Show sa, SocketAddress sa) => Socket -> sa -> IO ()
 connect s sa = withSocketsDo $ withSocketAddress sa $ \p_sa sz ->
-    connectLoop s p_sa (fromIntegral sz)
+    connectLoop sa s p_sa (fromIntegral sz)
 
-connectLoop :: SocketAddress sa => Socket -> Ptr sa -> CInt -> IO ()
-connectLoop s p_sa sz = withFdSocket s $ \fd -> loop fd
+connectLoop :: (Show sa, SocketAddress sa) => sa -> Socket -> Ptr sa -> CInt -> IO ()
+connectLoop sa s p_sa sz = withFdSocket s $ \fd -> loop fd
   where
-    errLoc = "Network.Socket.connect: " ++ show s
+    errLoc = "Network.Socket.connect: " ++ show s ++ " " ++ show sa
     loop fd = do
        r <- c_connect fd p_sa sz
        when (r == -1) $ do

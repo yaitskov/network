@@ -12,6 +12,7 @@ import qualified Network.Socket.Buffer as G
 import qualified Network.Socket.Name as G
 import qualified Network.Socket.Syscall as G
 import Network.Socket.Imports
+import Network.Socket.Info ()
 import Network.Socket.Types
 
 -- | Getting peer's 'SockAddr'.
